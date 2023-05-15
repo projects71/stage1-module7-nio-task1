@@ -1,5 +1,7 @@
 package com.epam.mjc.nio;
 
+import java.io.*;
+import java.io.FileReader;
 import java.util.Objects;
 
 public class Profile {
@@ -9,9 +11,14 @@ public class Profile {
     private String email;
     private Long phone;
 
-    public Profile() {
-
+    public Profile(File file) {
+        try {
+            readData(file);
+        } catch (IOException e) {
+            throw new MyOwnRuntimeException(e.getMessage());
+        }
     }
+
     public Profile(String name, Integer age, String email, Long phone) {
         this.name = name;
         this.age = age;
@@ -49,6 +56,32 @@ public class Profile {
 
     public void setPhone(Long phone) {
         this.phone = phone;
+    }
+
+    public void readData(File file) throws IOException{
+
+        String s;
+        String[] sts = new String[4];
+        int i = 0;
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        try (InputStream inputStream = null) {
+
+            while ((s = reader.readLine()) != null) {
+                String line = s.split(":")[1];
+                sts[i++] = line;
+
+            }
+        } catch (IOException e) {
+            throw new MyOwnRuntimeException("My message");
+        } finally {
+            reader.close();
+        }
+
+
+        this.name = sts[0].substring(1);
+        this.email = sts[2].substring(1);
+        this.age = Integer.valueOf(sts[1].substring(1));
+        this.phone = Long.valueOf(sts[3].substring(1));
     }
 
     @Override
